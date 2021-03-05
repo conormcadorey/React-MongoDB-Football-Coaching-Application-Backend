@@ -19,6 +19,11 @@ const userSchema = new mongoose.Schema({
       trim: true,
       minlength: 3
     },
+    team: {
+      type: String,
+      required: true,
+      minLength: 2
+    }
   }, {
     timestamps: true,
   });

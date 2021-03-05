@@ -14,6 +14,10 @@ const playerSchema = new mongoose.Schema({
     number: {
         type: Number
     },
+    team: {
+        type: String,
+        required: true
+    },
     //ID of user creating the player - not the player ID!
     userId: {
         type: String,

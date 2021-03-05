@@ -10,10 +10,10 @@ router.post("/register", async (req, res) => {
     try {
       //get data from the body of the POST req
       //json body parser automatically parses string to json object 
-      let { email, password, passwordCheck, userName } = req.body; 
+      let { email, password, passwordCheck, userName, team } = req.body; 
       
       //validation 
-      if (!email || !password || !passwordCheck || !userName)
+      if (!email || !password || !passwordCheck || !userName || !team )
         return res.status(400).json({ msg: "Please complete all fields!"});
       if (password.length < 8)
         return res.status(400).json({ msg: "Password must be at least 8 characters long!"});
@@ -36,7 +36,8 @@ router.post("/register", async (req, res) => {
       const newUser = new User({
         email,
         password: passwordHash,
-        userName
+        userName,
+        team
       });
         const savedUser = await newUser.save(); 
         res.json(savedUser); 
@@ -80,6 +81,7 @@ router.post("/register", async (req, res) => {
         user: {
           id: user._id,
           userName: user.userName,
+          team: user.team
         },
       });
   
@@ -129,5 +131,27 @@ router.get("/", auth, async (req, res) => {
       id: user._id,
     });
   });
+
+//UPDATE USERNAME
+router.put("/editname/:id", auth, async (req, res) => {
+  const updatedName = await User
+  .findById(req.params.id)
+  .then(user=> {
+      user.userName = req.body.userName;
+
+      user
+      .save()
+      .then(() => res.json(user.name))
+      .catch(err => res.status(400).json({ msg: "There was a problem, please try again"}))
+      
+  })
+  .catch(err => res.status(400).json({ msg: "User not found!"}))
+});
+
+//GET ALL USER TEAMS
+router.get("/allteams", async (req, res) => {
+  const teams = await User.distinct("team");
+  res.json(teams);
+}); 
 
 module.exports = router;

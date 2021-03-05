@@ -5,7 +5,7 @@ const Player = require("../models/playerModel");
 //CREATE PLAYER
 router.post("/", auth, async (req, res) => {
     try {
-        const { name, position, number } = req.body;
+        const { name, position, number, team } = req.body;
         //validation
         if (!name) 
             return res.status(400).json({ msg: "Please enter a player name" });
@@ -23,6 +23,7 @@ router.post("/", auth, async (req, res) => {
             name,
             position,
             number,
+            team,
             userId: req.user, //get current users id from the request
         });
         const savedPlayer = await newPlayer.save();
@@ -35,12 +36,11 @@ router.post("/", auth, async (req, res) => {
 
 //GET ALL PLAYERS INFO
 router.get("/all", async (req, res) => {
-    //query for all players linked the current uid
     const players = await Player.find();
-    //response with array of relevent players
     res.json(players);
 }); 
 
+/*
 //GET ALL PLAYERS USING AUTH MIDDLEWARE 
 router.get("/allauth", auth, async (req, res) => {
     //query for all players linked the current uid
@@ -48,15 +48,17 @@ router.get("/allauth", auth, async (req, res) => {
     //response with array of relevent players
     res.json(players);
 }); 
-
-/*
-router.get("/all", auth, async (req, res) => {
-    //query for all players linked the current uid
-    const players = await Player.find({ userId: req.user });
-    //response with array of relevent players
-    res.json(players);
-}); 
 */
+
+//GET ALL PLAYERS USING AUTH MIDDLEWARE 
+router.get("/allauth/:myTeam", auth, async (req, res) => {
+    const players = await Player.find({'team': req.params.myTeam});
+    if (players.length === 0) {
+        return res.status(400).json({ msg: "No players!" });
+    } else {
+        res.json(players);
+    }
+}); 
 
 //DELETE PLAYER
 router.delete("/delete/:id", auth, async (req, res) => {
@@ -70,7 +72,53 @@ router.delete("/delete/:id", auth, async (req, res) => {
         res.json(deletedPlayer);
 });
 
-//TEST ROUTE
+//EDIT PLAYER NAME
+router.put("/editname/:id", auth, async (req, res) => {
+    const updatedPlayer = await Player
+    .findById(req.params.id)
+    .then(player=> {
+        player.name = req.body.name;
+
+        player
+        .save()
+        .then(() => res.json(player.name))
+        .catch(err => res.status(400).json({ msg: "There was a problem, please try again"}))
+        
+    })
+    .catch(err => res.status(400).json({ msg: "Player not found!"}))
+});
+
+//EDIT PLAYER POSITION
+router.put("/editposition/:id", auth, async (req, res) => {
+    const updatedPlayer = await Player
+    .findById(req.params.id)
+    .then(player=> {
+        player.position = req.body.position;
+
+        player
+        .save()
+        .then(() => res.json(player.position))
+        .catch(err => res.status(400).json({ msg: "There was a problem, please try again"}))
+        
+    })
+    .catch(err => res.status(400).json({ msg: "Player not found!"}))
+});
+
+//EDIT PLAYER NUMBER
+router.put("/editnumber/:id", auth, async (req, res) => {
+    const updatedPlayer = await Player
+    .findById(req.params.id)
+    .then(player=> {
+        player.number = req.body.number;
+
+        player
+        .save()
+        .then(() => res.json(player.number))
+        .catch(err => res.status(400).json({ msg: "There was a problem, please try again"}))
+        
+    })
+    .catch(err => res.status(400).json({ msg: "Player not found!"}))
+});
 
 module.exports = router; 
 
