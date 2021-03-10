@@ -27,6 +27,6 @@ mongoose.connect(process.env.MONGODB_CONNECTION_STRING,
 
 //build routes
 //when on users path, require the userRouter.js middlewear
-//this middlewear only applies to /users
 app.use("/users", require("./routes/userRouter"));
 app.use("/players", require("./routes/playerRouter"));
+app.use("/match", require("./routes/matchRouter"));

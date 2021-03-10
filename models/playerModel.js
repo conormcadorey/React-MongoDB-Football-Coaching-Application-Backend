@@ -6,13 +6,16 @@ const playerSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true,
-        minlength: 3
+        minlength: 3,
+        trim: true
     },
     position: {
-        type: String
+        type: String,
+        trim: true
     },
     number: {
-        type: Number
+        type: Number,
+        trim: true
     },
     team: {
         type: String,

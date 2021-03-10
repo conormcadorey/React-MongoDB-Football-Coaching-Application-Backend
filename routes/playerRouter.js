@@ -40,16 +40,6 @@ router.get("/all", async (req, res) => {
     res.json(players);
 }); 
 
-/*
-//GET ALL PLAYERS USING AUTH MIDDLEWARE 
-router.get("/allauth", auth, async (req, res) => {
-    //query for all players linked the current uid
-    const players = await Player.find();
-    //response with array of relevent players
-    res.json(players);
-}); 
-*/
-
 //GET ALL PLAYERS USING AUTH MIDDLEWARE 
 router.get("/allauth/:myTeam", auth, async (req, res) => {
     const players = await Player.find({'team': req.params.myTeam});
