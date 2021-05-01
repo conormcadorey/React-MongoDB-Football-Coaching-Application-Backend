@@ -20,7 +20,7 @@ router.post("/submitmatch", auth, async (req, res) => {
             homeAway,
             complete,
             duration,
-            userId: req.user //get current users id 
+            userId: req.user
         });
 
         const savedMatch =  await newMatch.save();
@@ -31,7 +31,32 @@ router.post("/submitmatch", auth, async (req, res) => {
     }
 });
 
-//GET ALL MATCHS
+//SAVE A FUTURE MATCH 
+router.post("/saveforlater", auth, async (req, res) => {
+    try {
+        const {myTeam, oppTeam, homeAway, complete} = req.body;
+
+        if (!oppTeam) {
+            return res.status(400)
+            .json({ msg: "Enter your opposition!" });
+        }
+
+        const futureMatch = new Match({
+            myTeam,
+            oppTeam,
+            homeAway,
+            complete,
+            userId: req.user 
+        });
+
+        const savedMatch = await futureMatch.save();
+        res.json(savedMatch);
+    } catch {
+        res.status(500).json({ msg : "Match could not be saved for later, please try again!"});
+    }
+})
+
+//GET ALL MATCHES
 router.get("/allmatches", async (req, res) => {
     const matches = await Match.find();
     res.json(matches);
