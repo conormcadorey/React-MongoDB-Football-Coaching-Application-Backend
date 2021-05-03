@@ -62,4 +62,35 @@ router.get("/allmatches", async (req, res) => {
     res.json(matches);
 }); 
 
+//GET ALL UPCOMING MATCHES
+router.get("/upcomingmatches", async (req, res) => {
+    const matches = await Match.find({complete: "N"});
+    if (matches.length === 0) {
+        return res.status(400).json({ msg: "There are no scheduled upcoming matches." });
+    } else {
+        res.json(matches);
+    }
+}); 
+
+
 module.exports = router; 
+
+//DELETE MATCH
+router.delete("/delete/:id", auth, async (req, res) => {
+    const match = await Match.findOne({userId: req.user, _id: req.params.id});
+    if (!match)
+        return res.status(400).json({ msg: "Match not found!" });
+    //if verified
+    const deletedMatch = await Match.findByIdAndDelete(req.params.id);
+        res.json(deletedMatch);
+});
+
+//DELETE UPCOMING MATCH ON INITIATION
+router.delete("/replace/:id", auth, async (req, res) => {
+    const match = await Match.findOne({_id: req.params.id});
+    if (!match)
+        return res.status(400).json({ msg: "Match not found!" });
+    //if verified
+    const deletedMatch = await Match.findByIdAndDelete(req.params.id);
+        res.json(deletedMatch);
+});
