@@ -7,6 +7,9 @@ const matchSchema = new mongoose.Schema({
     oppTeam: {
         type: String
     },
+    opposition: {
+        type: String
+    },
     myGoals: {
         type: String
     },

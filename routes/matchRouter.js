@@ -2,6 +2,10 @@ const router = require("express").Router();
 const auth = require("../middleware/auth");
 const Match = require("../models/matchModel");
 
+function upperCase(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
+}
+
 //SAVE COMPLETED MATCH
 router.post("/submitmatch", auth, async (req, res) => {
     try {
@@ -41,9 +45,11 @@ router.post("/saveforlater", auth, async (req, res) => {
             .json({ msg: "Enter your opposition!" });
         }
 
+        let opposition = upperCase(oppTeam);
+
         const futureMatch = new Match({
             myTeam,
-            oppTeam,
+            opposition,
             homeAway,
             complete,
             userId: req.user 
@@ -57,19 +63,15 @@ router.post("/saveforlater", auth, async (req, res) => {
 })
 
 //GET ALL MATCHES
-router.get("/allmatches", async (req, res) => {
-    const matches = await Match.find();
+router.get("/allmatches/:myTeam", async (req, res) => {
+    const matches = await Match.find({"myTeam": req.params.myTeam, complete: "Y"});
     res.json(matches);
 }); 
 
 //GET ALL UPCOMING MATCHES
-router.get("/upcomingmatches", async (req, res) => {
-    const matches = await Match.find({complete: "N"});
-    if (matches.length === 0) {
-        return res.status(400).json({ msg: "There are no scheduled upcoming matches." });
-    } else {
+router.get("/upcomingmatches/:myTeam", async (req, res) => {
+    const matches = await Match.find({"myTeam": req.params.myTeam, complete: "N"});
         res.json(matches);
-    }
 }); 
 
 
