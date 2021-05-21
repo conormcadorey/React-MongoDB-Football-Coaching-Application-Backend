@@ -50,6 +50,39 @@ router.get("/allauth/:myTeam", auth, async (req, res) => {
     }
 }); 
 
+//PAGINATE PLAYERS
+router.get("/paginate/:myTeam", auth, async (req, res) => {
+    const page = parseInt(req.query.page)
+    const limit = parseInt(req.query.limit)
+    const startIndex = (page - 1) * limit
+    const endIndex = page * limit
+    const players = {}
+
+    //next results
+    
+    if (endIndex < await Match.countDocuments().exec()) {
+    players.next = {
+        page: page + 1,
+        limit: limit
+        }
+    }
+    //previous results
+    if (startIndex > 0) {
+    players.previous = {
+        page: page - 1,
+        limit: limit
+        }
+    }
+    
+    try {
+        players.results = await Player.find({'team': req.params.myTeam}).sort({ createdAt: 'desc' }).limit(limit).skip(startIndex).exec()
+        res.paginatedResults = players
+        res.json(players)
+    } catch (err) {
+        res.status(500).json({ msg: err.message })
+    }
+});
+
 //DELETE PLAYER
 router.delete("/delete/:id", auth, async (req, res) => {
     //verify user id
